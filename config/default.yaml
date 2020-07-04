@@ -25,11 +25,9 @@ form:
   target:
     wav: '*-target.wav'
     mag: '*-target.pt'
-    phase: '*-target_phase.pt'
   mixed:
     wav: '*-mixed.wav'
     mag: '*-mixed.pt'
-    phase: '*-mixed_phase.pt'
 ---
 train:
   batch_size: 8

@@ -65,19 +65,13 @@ def mix(hp, args, audio, num, s1_dvec, s1_target, s2, train):
     librosa.output.write_wav(target_wav_path, w1, srate)
     librosa.output.write_wav(mixed_wav_path, mixed, srate)
 
-    # save magnitude & phase spectrograms
-    target_mag, target_phase = audio.wav2spec(w1)
-    mixed_mag, mixed_phase = audio.wav2spec(mixed)
-
+    # save magnitude spectrograms
+    target_mag, _ = audio.wav2spec(w1)
+    mixed_mag, _ = audio.wav2spec(mixed)
     target_mag_path = formatter(dir_, hp.form.target.mag, num)
-    target_phase_path = formatter(dir_, hp.form.target.phase, num)
     mixed_mag_path = formatter(dir_, hp.form.mixed.mag, num)
-    mixed_phase_path = formatter(dir_, hp.form.mixed.phase, num)
-
     torch.save(torch.from_numpy(target_mag), target_mag_path)
-    torch.save(torch.from_numpy(target_phase), target_phase_path)
     torch.save(torch.from_numpy(mixed_mag), mixed_mag_path)
-    torch.save(torch.from_numpy(mixed_phase), mixed_phase_path)
 
     # save selected sample as text file. d-vec will be calculated soon
     dvec_text_path = formatter(dir_, hp.form.dvec, num)
