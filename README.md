@@ -1,7 +1,3 @@
-# Infocom2021
-Flowchartof the AI network.
-![](./assets/FlowchartNetwork.png)
-
 # VoiceFilter
 
 Unofficial PyTorch implementation of Google AI's:
@@ -41,7 +37,7 @@ Unofficial PyTorch implementation of Google AI's:
     pip install -r requirements.txt
     ```
 
-1. Miscellaneous 
+1. Miscellaneous
 
     [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize) is used for resampling and normalizing wav files.
     See README.md of [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize/blob/master/README.md) for installation.
@@ -96,9 +92,9 @@ Unofficial PyTorch implementation of Google AI's:
     where utterances are randomly fit to time length [70, 90] frames.
     Tests are done with window 80 / hop 40 and have shown equal error rate about 1%.
     Data used for test were selected from first 8 speakers of [VoxCeleb1](http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox1.html) test dataset, where 10 utterances per each speakers are randomly selected.
-    
+
     **Update**: Evaluation on VoxCeleb1 selected pair showed 7.4% EER.
-    
+
     The model can be downloaded at [this GDrive link](https://drive.google.com/file/d/1YFmhmUok-W76JkrfA0fzQt3c-ZsfiwfL/view?usp=sharing).
 
 1. Run
@@ -114,7 +110,7 @@ Unofficial PyTorch implementation of Google AI's:
     ```bash
     tensorboard --logdir ./logs
     ```
-    
+
     ![](./assets/tensorboard.png)
 
 1. Resuming from checkpoint
