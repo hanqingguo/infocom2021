@@ -49,12 +49,9 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
         criterion = nn.MSELoss()
         while True:
             model.train()
-            for dvec_mels, target_mag, mixed_mag, target_phase, mixed_phase, mixed_wav in trainloader:
+            for dvec_mels, target_mag, mixed_mag in trainloader:
                 target_mag = target_mag.cuda()
                 mixed_mag = mixed_mag.cuda()
-
-                target_phase = target_phase.cuda()
-                mixed_phase = mixed_phase.cuda()
 
                 dvec_list = list()
                 for mel in dvec_mels:
@@ -64,21 +61,12 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 dvec = torch.stack(dvec_list, dim=0)
                 dvec = dvec.detach()
 
-                mask = model(mixed_mag, dvec)
-                purified_mag = mixed_mag * mask
+                noise_mag = model(mixed_mag, dvec)
+                purified_mag = mixed_mag - noise_mag
 
-                # modified code
-                purified_mag = purified_mag.cpu().detach().numpy()
-                purified_wav=audio.spec2wav(purified_mag, mixed_phase)
-
-                mixed_wav = mixed_wav.detach().numpy()
-
-                denoised_wav=purified_wav+mixed_wav
-                output, _ = audio.wav2spec(denoised_wav)
-                
                 # output = torch.pow(torch.clamp(output, min=0.0), hp.audio.power)
                 # target_mag = torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power)
-                loss = criterion(output, target_mag)
+                loss = criterion(purified_mag, target_mag)
 
                 optimizer.zero_grad()
                 loss.backward()

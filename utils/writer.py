@@ -13,8 +13,8 @@ class MyWriter(SummaryWriter):
         self.add_scalar('train_loss', train_loss, step)
 
     def log_evaluation(self, test_loss, sdr,
-                       mixed_wav, target_wav, est_wav,
-                       mixed_spec, target_spec, est_spec, est_mask,
+                       mixed_wav, est_noise_wav, est_purified_wav, target_wav,
+                       mixed_spec, target_spec, est_purified_mag, est_noise_mag,
                        step):
         
         self.add_scalar('test_loss', test_loss, step)
@@ -22,15 +22,16 @@ class MyWriter(SummaryWriter):
 
         self.add_audio('mixed_wav', mixed_wav, step, self.hp.audio.sample_rate)
         self.add_audio('target_wav', target_wav, step, self.hp.audio.sample_rate)
-        self.add_audio('estimated_wav', est_wav, step, self.hp.audio.sample_rate)
+        self.add_audio('est_noise_wav', est_noise_wav, step, self.hp.audio.sample_rate)
+        self.add_audio('est_purified_wav', est_purified_wav, step, self.hp.audio.sample_rate )
 
         self.add_image('data/mixed_spectrogram',
             plot_spectrogram_to_numpy(mixed_spec), step, dataformats='HWC')
+        self.add_image('result/est_noise_spectrogram',
+            plot_spectrogram_to_numpy(est_noise_mag), step, dataformats='HWC')
+        self.add_image('result/est_purified_spectrogram',
+            plot_spectrogram_to_numpy(est_purified_mag), step, dataformats='HWC')
         self.add_image('data/target_spectrogram',
             plot_spectrogram_to_numpy(target_spec), step, dataformats='HWC')
-        self.add_image('result/estimated_spectrogram',
-            plot_spectrogram_to_numpy(est_spec), step, dataformats='HWC')
-        self.add_image('result/estimated_mask',
-            plot_spectrogram_to_numpy(est_mask), step, dataformats='HWC')
         self.add_image('result/estimation_error_sq',
-            plot_spectrogram_to_numpy(np.square(est_spec - target_spec)), step, dataformats='HWC')
+            plot_spectrogram_to_numpy(np.square(est_purified_mag - target_spec)), step, dataformats='HWC')
