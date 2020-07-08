@@ -18,7 +18,7 @@ def validate(audio, model, embedder, testloader, writer, step):
             dvec = embedder(dvec_mel)
             dvec = dvec.unsqueeze(0)
             est_noise_mag = model(mixed_mag, dvec)
-            est_purified_mag = mixed_mag - est_noise_mag
+            est_purified_mag = mixed_mag + est_noise_mag
             test_loss = criterion(target_mag, est_purified_mag).item()
 
             mixed_mag = mixed_mag[0].cpu().detach().numpy()
@@ -26,7 +26,7 @@ def validate(audio, model, embedder, testloader, writer, step):
             est_purified_mag = est_purified_mag[0].cpu().detach().numpy()
             est_noise_mag = est_noise_mag[0].cpu().detach().numpy()
             est_noise_wav = audio.spec2wav(est_noise_mag, mixed_phase)
-            est_purified_wav = mixed_wav - est_noise_wav
+            est_purified_wav = mixed_wav + est_noise_wav
             sdr = bss_eval_sources(target_wav, est_purified_wav, False)[0][0]
             writer.log_evaluation(test_loss, sdr,
                                   mixed_wav, est_noise_wav, est_purified_wav, target_wav,

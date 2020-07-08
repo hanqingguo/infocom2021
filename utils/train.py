@@ -11,6 +11,12 @@ from model.model import VoiceFilter
 from model.embedder import SpeechEmbedder
 
 
+def tensornormalize(S):
+    mu = torch.mean(S)
+    std = torch.std(S)
+    return (S - mu) / std
+
+
 def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str):
     # load embedder
     embedder_pt = torch.load(args.embedder_path)
@@ -62,7 +68,12 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 dvec = dvec.detach()
 
                 noise_mag = model(mixed_mag, dvec)
-                purified_mag = mixed_mag - noise_mag
+                purified_mag = tensornormalize(mixed_mag - noise_mag)
+
+                # print(purified_mag, mixed_mag, noise_mag)
+                print(torch.max(torch.max(mixed_mag[0])), torch.min(torch.min(mixed_mag[0])),
+                      torch.max(torch.max(noise_mag[0])), torch.min(torch.min(noise_mag[0])),
+                      torch.max(torch.max(purified_mag[0])), torch.min(torch.min(purified_mag[0])))
 
                 # output = torch.pow(torch.clamp(output, min=0.0), hp.audio.power)
                 # target_mag = torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power)
