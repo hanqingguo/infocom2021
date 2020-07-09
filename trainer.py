@@ -21,6 +21,8 @@ if __name__ == '__main__':
                         help="path of checkpoint pt file")
     parser.add_argument('-m', '--model', type=str, required=True,
                         help="Name of the model. Used for both logging and saving checkpoints.")
+    parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
+                        help="ID of the selected gpu. Used for gpu selection.")
     args = parser.parse_args()
 
     hp = HParam(args.config)
