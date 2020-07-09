@@ -11,10 +11,15 @@ from model.model import VoiceFilter
 from model.embedder import SpeechEmbedder
 
 
-def tensornormalize(S):
-    mu = torch.mean(S)
-    std = torch.std(S)
-    return (S - mu) / std
+def tensor_normalize(S, hp):
+    temp_max, _ = torch.max(S, dim=1)
+    batch_max, _ = torch.max(temp_max, dim=1)
+    batch_max = torch.reshape(batch_max, (hp.train.batch_size, 1, 1))
+    temp_min, _ = torch.min(S, dim=1)
+    batch_min, _ = torch.min(temp_min, dim=1)
+    batch_min = torch.reshape(batch_min, (hp.train.batch_size, 1, 1))
+    normalized_S = (S - batch_min)/(batch_max-batch_min)
+    return normalized_S
 
 
 def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str):
@@ -68,15 +73,8 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 dvec = dvec.detach()
 
                 noise_mag = model(mixed_mag, dvec)
-                purified_mag = tensornormalize(mixed_mag - noise_mag)
-
-                # print(purified_mag, mixed_mag, noise_mag)
-                print(torch.max(torch.max(mixed_mag[0])), torch.min(torch.min(mixed_mag[0])),
-                      torch.max(torch.max(noise_mag[0])), torch.min(torch.min(noise_mag[0])),
-                      torch.max(torch.max(purified_mag[0])), torch.min(torch.min(purified_mag[0])))
-
-                # output = torch.pow(torch.clamp(output, min=0.0), hp.audio.power)
-                # target_mag = torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power)
+                purified_mag = tensor_normalize(mixed_mag - noise_mag, hp)
+                # purified_mag.size() = [6, 301, 601]
                 loss = criterion(purified_mag, target_mag)
 
                 optimizer.zero_grad()
