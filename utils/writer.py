@@ -13,7 +13,7 @@ class MyWriter(SummaryWriter):
         self.add_scalar('train_loss', train_loss, step)
 
     def log_evaluation(self, test_loss, sdr,
-                       mixed_wav, est_noise_wav, est_purified_wav, target_wav,
+                       mixed_wav, est_noise_wav, est_purified_wav1, est_purified_wav2, est_purified_wav3, target_wav,
                        mixed_spec, target_spec, est_purified_mag, est_noise_mag,
                        step):
         
@@ -23,7 +23,9 @@ class MyWriter(SummaryWriter):
         self.add_audio('mixed_wav', mixed_wav, step, self.hp.audio.sample_rate)
         self.add_audio('target_wav', target_wav, step, self.hp.audio.sample_rate)
         self.add_audio('est_noise_wav', est_noise_wav, step, self.hp.audio.sample_rate)
-        self.add_audio('est_purified_wav', est_purified_wav, step, self.hp.audio.sample_rate )
+        self.add_audio('est_purified_wav1', est_purified_wav1, step, self.hp.audio.sample_rate )
+        self.add_audio('est_purified_wav2', est_purified_wav2, step, self.hp.audio.sample_rate)
+        self.add_audio('est_purified_wav3', est_purified_wav3, step, self.hp.audio.sample_rate)
 
         self.add_image('data/mixed_spectrogram',
             plot_spectrogram_to_numpy(mixed_spec), step, dataformats='HWC')

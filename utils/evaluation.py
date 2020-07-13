@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from mir_eval.separation import bss_eval_sources
+import numpy as np
 
 
 def tensor_normalize(S):
@@ -38,10 +39,15 @@ def validate(audio, model, embedder, testloader, writer, step):
             est_purified_mag = est_purified_mag[0].cpu().detach().numpy()
             est_noise_mag = est_noise_mag[0].cpu().detach().numpy()
             est_noise_wav = audio.spec2wav(est_noise_mag, mixed_phase)
-            est_purified_wav = mixed_wav + est_noise_wav
-            sdr = bss_eval_sources(target_wav, est_purified_wav, False)[0][0]
+            scale = np.max(mixed_mag - est_noise_mag) - np.min(mixed_mag - est_noise_mag)
+            # scale is frequency pass to time domain, used on wav signal normalization
+            est_purified_wav1 = audio.spec2wav(est_purified_mag, mixed_phase)  # path 1
+            est_purified_wav2 = (mixed_wav + est_noise_wav) / scale  # path 2
+            est_purified_wav3 = mixed_wav + est_noise_wav  # path 3
+            sdr = bss_eval_sources(target_wav, est_purified_wav1, False)[0][0]
             writer.log_evaluation(test_loss, sdr,
-                                  mixed_wav, est_noise_wav, est_purified_wav, target_wav,
+                                  mixed_wav, est_noise_wav, est_purified_wav1, est_purified_wav2, est_purified_wav3,
+                                  target_wav,
                                   mixed_mag.T, target_mag.T, est_purified_mag.T, est_noise_mag.T,
                                   step)
             break
