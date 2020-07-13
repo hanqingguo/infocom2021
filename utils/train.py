@@ -64,7 +64,8 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
             for dvec_mels, target_mag, mixed_mag in trainloader:
                 target_mag = target_mag.cuda()
                 mixed_mag = mixed_mag.cuda()
-
+                new_target_mag = mixed_mag - target_mag
+                # normalize?
                 dvec_list = list()
                 for mel in dvec_mels:
                     mel = mel.cuda()
@@ -76,7 +77,7 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 noise_mag = model(mixed_mag, dvec)
                 purified_mag = tensor_normalize(mixed_mag - noise_mag, hp)
                 # purified_mag.size() = [6, 301, 601]
-                loss = criterion(purified_mag, target_mag)
+                loss = criterion(purified_mag, new_target_mag)
 
                 optimizer.zero_grad()
                 loss.backward()
