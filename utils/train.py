@@ -64,6 +64,7 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
             for dvec_mels, target_mag, mixed_mag in trainloader:
                 target_mag = target_mag.cuda()
                 mixed_mag = mixed_mag.cuda()
+                # time domain minus, then convert to spectrogram
                 new_target_mag = mixed_mag - target_mag
                 # normalize?
                 dvec_list = list()
