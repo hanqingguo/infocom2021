@@ -42,8 +42,13 @@ def validate(audio, model, embedder, testloader, writer, step):
             scale = np.max(mixed_mag - est_noise_mag) - np.min(mixed_mag - est_noise_mag)
             # scale is frequency pass to time domain, used on wav signal normalization
             est_purified_wav1 = audio.spec2wav(est_purified_mag, mixed_phase)  # path 1
-            est_purified_wav2 = (mixed_wav + est_noise_wav) / scale  # path 2
-            est_purified_wav3 = mixed_wav + est_noise_wav  # path 3
+            print("scale is :{}".format(scale))
+            print("Max of est noise is: {}".format(max(abs(est_noise_wav))))
+            print("Max of Mixed wav is: {}".format(max(abs(mixed_wav))))
+            est_purified_wav2 = (mixed_wav + 50*est_noise_wav) / max(abs(mixed_wav + 50*est_noise_wav))  # path 2
+            print(max(est_purified_wav2), min(est_purified_wav2))
+            est_purified_wav3 = (mixed_wav + est_noise_wav)/ max(abs(mixed_wav + est_noise_wav))  # path 3
+            print(max(est_purified_wav3), min(est_purified_wav3))
             sdr = bss_eval_sources(target_wav, est_purified_wav1, False)[0][0]
             writer.log_evaluation(test_loss, sdr,
                                   mixed_wav, est_noise_wav, est_purified_wav1, est_purified_wav2, est_purified_wav3,
