@@ -61,11 +61,11 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
         criterion = nn.MSELoss()
         while True:
             model.train()
-            for dvec_mels, target_mag, mixed_mag in trainloader:
+            for dvec_mels, target_mag, mixed_mag, new_target_mag in trainloader:
                 target_mag = target_mag.cuda()
                 mixed_mag = mixed_mag.cuda()
                 # time domain minus, then convert to spectrogram
-                new_target_mag = mixed_mag - target_mag
+                new_target_mag = new_target_mag.cuda()
                 # normalize?
                 dvec_list = list()
                 for mel in dvec_mels:
