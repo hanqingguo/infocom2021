@@ -31,7 +31,7 @@ def validate(audio, model, embedder, testloader, writer, step):
             dvec = dvec.unsqueeze(0)
             est_noise_mag = model(mixed_mag, dvec)
             # est_noise_mag.size() = [1, 301, 601]
-            est_purified_mag = tensor_normalize(mixed_mag - est_noise_mag)
+            est_purified_mag = tensor_normalize(mixed_mag + est_noise_mag)
             test_loss = criterion(new_target_mag, est_purified_mag).item()
 
             mixed_mag = mixed_mag[0].cpu().detach().numpy()
@@ -40,11 +40,11 @@ def validate(audio, model, embedder, testloader, writer, step):
             est_purified_mag = est_purified_mag[0].cpu().detach().numpy()
             est_noise_mag = est_noise_mag[0].cpu().detach().numpy()
             est_noise_wav = audio.spec2wav(est_noise_mag, mixed_phase)
-            scale = np.max(mixed_mag - est_noise_mag) - np.min(mixed_mag - est_noise_mag)
+            scale = np.max(mixed_mag + est_noise_mag) - np.min(mixed_mag + est_noise_mag)
             # scale is frequency pass to time domain, used on wav signal normalization
             est_purified_wav1 = audio.spec2wav(est_purified_mag, mixed_phase)  # path 1
-            est_purified_wav2 = (mixed_wav - est_noise_wav) / scale  # path 2
-            est_purified_wav3 = mixed_wav - est_noise_wav  # path 3
+            est_purified_wav2 = (mixed_wav + 50*est_noise_wav) / max(abs(mixed_wav + 50*est_noise_wav))  # path 2
+            est_purified_wav3 = mixed_wav + est_noise_wav  # path 3
             sdr = bss_eval_sources(new_target_wav, est_purified_wav1, False)[0][0]
             # do normalize wav or not?
             writer.log_evaluation(test_loss, sdr,

@@ -76,7 +76,7 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 dvec = dvec.detach()
 
                 noise_mag = model(mixed_mag, dvec)
-                purified_mag = tensor_normalize(mixed_mag - noise_mag, hp)
+                purified_mag = tensor_normalize(mixed_mag + noise_mag, hp)
                 # purified_mag.size() = [6, 301, 601]
                 loss = criterion(purified_mag, new_target_mag)
 
