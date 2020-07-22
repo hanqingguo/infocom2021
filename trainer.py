@@ -23,6 +23,8 @@ if __name__ == '__main__':
                         help="Name of the model. Used for both logging and saving checkpoints.")
     parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
                         help="ID of the selected gpu. Used for gpu selection.")
+    parser.add_argument('-n', '--new_dataset', type=int, required=True,
+                        help="use either new dataset or old dataset for differnt dataloader. 0 is old dataset, 1 is new dataset")
     args = parser.parse_args()
 
     hp = HParam(args.config)

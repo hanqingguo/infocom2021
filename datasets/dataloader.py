@@ -46,7 +46,10 @@ def create_dataloader(hp, args, train):
 class VFDataset(Dataset):
     def __init__(self, hp, args, train):
         def find_all(file_format):
-            return sorted(glob.glob(os.path.join(self.data_dir, '**', file_format), recursive=True))
+            if args.new_dataset:
+                return sorted(glob.glob(os.path.join(self.data_dir, '**', file_format), recursive=True))
+            else:
+                return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
         self.hp = hp
         self.args = args
         self.train = train
