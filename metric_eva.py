@@ -18,6 +18,7 @@ from utils.speech2text import speech_2_text
 from utils.evaluation import tensor_normalize
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 def wav_to_embedding(wav, embedder):
@@ -33,6 +34,16 @@ def wav_to_embedding(wav, embedder):
     wav_dvector = wav_dvector.cpu().detach().numpy()
 
     return wav_dvector
+
+def init_badwav():
+    wer = 1
+    mer = 1
+    wil = 1
+    pesq_value = 0
+    sdr = [-10]
+    sir = [np.inf]
+    sar = [-10]
+    return wer, mer, wil, pesq_value, sdr, sir, sar
 
 
 if __name__ == '__main__':
@@ -128,38 +139,43 @@ if __name__ == '__main__':
         mixed_conf = cosine_similarity(dvec, mixed_dvec)[0][0]
 
         try:
-
             [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, purified1, 'google')
-            print(
-                "Spectrogram: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
-            r1 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence" : purified1_conf}
-            result_purified1.append(r1)
-
-            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, purified2, 'google')
-            print("Noise: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
-            r2 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence" : purified2_conf}
-            result_purified2.append(r2)
-
-            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, purified3, 'google')
-            print("Enhanced: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
-            r3 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence" : purified3_conf}
-            result_purified3.append(r3)
-
-            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, mixed_path, 'google')
-            print("Mixed: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
-            r4 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence" : mixed_conf}
-            result_mixed.append(r4)
-
         except TypeError:
-            print("Cannot understand")
+            wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            # print(
+            #     "Spectrogram: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
+        r1 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
+              "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+              "confidence": purified1_conf}
+        result_purified1.append(r1)
+
+        try:
+            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, purified2, 'google')
+        except TypeError:
+            wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+
+        r2 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
+              "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+              "confidence": purified2_conf}
+        result_purified2.append(r2)
+
+        try:
+            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, purified3, 'google')
+        except TypeError:
+            wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+        r3 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
+              "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+              "confidence": purified3_conf}
+        result_purified3.append(r3)
+
+        try:
+            [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(target_path, mixed_path, 'google')
+        except TypeError:
+            wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+        r4 = {"mixed_path": mixed_wav_path, "target_path": target_wav_path,
+              "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+              "confidence": mixed_conf}
+        result_mixed.append(r4)
 
     writer = pd.ExcelWriter(r'conversation.xlsx', engine='xlsxwriter', options={'strings_to_urls': False})
     df1 = pd.DataFrame(data=result_purified1)
