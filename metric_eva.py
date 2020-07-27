@@ -177,7 +177,7 @@ if __name__ == '__main__':
               "confidence": mixed_conf}
         result_mixed.append(r4)
 
-    writer = pd.ExcelWriter(r'conversation.xlsx', engine='xlsxwriter', options={'strings_to_urls': False})
+    writer = pd.ExcelWriter(r'joint-[0dB].xlsx', engine='xlsxwriter', options={'strings_to_urls': False})
     df1 = pd.DataFrame(data=result_purified1)
     df2 = pd.DataFrame(data=result_purified2)
     df3 = pd.DataFrame(data=result_purified3)
