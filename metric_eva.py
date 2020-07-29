@@ -62,6 +62,8 @@ if __name__ == '__main__':
                         help="ID of the selected gpu. Used for gpu selection.")
     parser.add_argument('-o', '--out_dir', type=str, required=True,
                         help="out directory of result.wav")
+    parser.add_argument('-x', '--xlsx', type=str, required=True,
+                        help="result name of xlsx file")
     args = parser.parse_args()
 
     hp = HParam(args.config)
@@ -177,7 +179,7 @@ if __name__ == '__main__':
               "confidence": mixed_conf}
         result_mixed.append(r4)
 
-    writer = pd.ExcelWriter(r'joint-[0dB].xlsx', engine='xlsxwriter', options={'strings_to_urls': False})
+    writer = pd.ExcelWriter(args.xlsx, engine='xlsxwriter', options={'strings_to_urls': False})
     df1 = pd.DataFrame(data=result_purified1)
     df2 = pd.DataFrame(data=result_purified2)
     df3 = pd.DataFrame(data=result_purified3)
